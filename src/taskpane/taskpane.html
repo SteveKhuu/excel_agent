@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Excel Claude Assistant</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+
+    <!-- For more information on Fluent UI, visit https://developer.microsoft.com/fluentui#/. -->
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/9.6.1/css/fabric.min.css"/>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: "Segoe UI", sans-serif;
+        }
+        
+        .header {
+            background: #0078d4;
+            color: white;
+            padding: 15px;
+            margin: -20px -20px 20px -20px;
+            text-align: center;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e1e1e1;
+            border-radius: 4px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .ms-Button {
+            flex: 1;
+            padding: 10px;
+            background: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        
+        .ms-Button:hover {
+            background: #106ebe;
+        }
+        
+        .ms-Button:disabled {
+            background: #f3f2f1;
+            color: #a19f9d;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #dff6dd;
+            border: 1px solid #0f7b0f;
+            color: #0f7b0f;
+        }
+        
+        .status.error {
+            background: #fde7e9;
+            border: 1px solid #d13438;
+            color: #d13438;
+        }
+        
+        .status.info {
+            background: #deecf9;
+            border: 1px solid #0078d4;
+            color: #0078d4;
+        }
+        
+        .result-area {
+            min-height: 200px;
+            border: 1px solid #e1e1e1;
+            padding: 15px;
+            border-radius: 4px;
+            background: #fafafa;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .config-section {
+            background: #f8f8f8;
+        }
+        
+        .ms-TextField {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e1e1e1;
+            border-radius: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #0078d4;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h2>🤖 Claude Excel Assistant</h2>
+    </div>
+
+    <div class="section config-section">
+        <h3>Configuration</h3>
+        <label for="api-key">Anthropic API Key:</label>
+        <input type="password" id="api-key" class="ms-TextField" placeholder="Enter your API key...">
+        <small>Your API key is stored locally and never shared.</small>
+    </div>
+
+    <div class="section">
+        <h3>Quick Actions</h3>
+        <div class="button-group">
+            <button class="ms-Button" id="analyze-selection">Add Analysis Columns</button>
+            <button class="ms-Button" id="create-formula">Create Formula Column</button>
+        </div>
+        <div class="button-group">
+            <button class="ms-Button" id="data-insights">Add Insight Columns</button>
+            <button class="ms-Button" id="auto-categorize">Auto-Categorize Data</button>
+        </div>
+        <div class="button-group">
+            <button class="ms-Button" id="clean-data">Clean & Standardize</button>
+            <button class="ms-Button" id="add-calculations">Add Calculations</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Custom Request</h3>
+        <textarea id="custom-prompt" class="ms-TextField" rows="3" placeholder="Ask Claude anything about your data..."></textarea>
+        <button class="ms-Button" id="send-custom">Send Request</button>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="loading" id="loading">🔄 Processing with Claude...</div>
+
+    <div class="section">
+        <h3>Results</h3>
+        <div class="result-area" id="results">Results will appear here...</div>
+        <button class="ms-Button" id="insert-results" style="margin-top: 10px;" disabled>Insert to Excel</button>
+    </div>
+
+    <script src="taskpane.js"></script>
+</body>
+</html>
