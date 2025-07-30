@@ -155,9 +155,23 @@ async function sendCustomRequest() {
 async function createSimpleWorksheet(context, response, title) {
   try {
     const timestamp = new Date().toISOString().slice(0, 16).replace(/[:-]/g, "");
-    const worksheetName = "Claude_" + timestamp;
+    const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const worksheetName = "Claude_" + timestamp + "_" + randomSuffix;
     
-    const newWorksheet = context.workbook.worksheets.add(worksheetName);
+    // Check if worksheet already exists and increment if needed
+    let finalWorksheetName = worksheetName;
+    let counter = 1;
+    
+    const existingSheets = context.workbook.worksheets;
+    existingSheets.load("items/name");
+    await context.sync();
+    
+    while (existingSheets.items.some(sheet => sheet.name === finalWorksheetName)) {
+      finalWorksheetName = worksheetName + "_" + counter;
+      counter++;
+    }
+    
+    const newWorksheet = context.workbook.worksheets.add(finalWorksheetName);
     
     const tables = extractOnlyCodeBlockTables(response);
     
@@ -187,9 +201,23 @@ async function createSimpleWorksheet(context, response, title) {
 async function createAnalysisWorksheet(context, response, originalRange) {
   try {
     const timestamp = new Date().toISOString().slice(0, 16).replace(/[:-]/g, "");
-    const worksheetName = "Analysis_" + timestamp;
+    const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const worksheetName = "Analysis_" + timestamp + "_" + randomSuffix;
     
-    const newWorksheet = context.workbook.worksheets.add(worksheetName);
+    // Also check if worksheet already exists and increment if needed
+    let finalWorksheetName = worksheetName;
+    let counter = 1;
+    
+    const existingSheets = context.workbook.worksheets;
+    existingSheets.load("items/name");
+    await context.sync();
+    
+    while (existingSheets.items.some(sheet => sheet.name === finalWorksheetName)) {
+      finalWorksheetName = worksheetName + "_" + counter;
+      counter++;
+    }
+    
+    const newWorksheet = context.workbook.worksheets.add(finalWorksheetName);
     
     // Add reference to original data
     let currentRow = 0;
