@@ -149,16 +149,227 @@ async function sendCustomRequest() {
     showLoading(false);
   }
 }
+// async function createSimpleWorksheet(context, response, title) {
+//   try {
+//     const timestamp = new Date().toISOString().slice(0, 16).replace(/[:-]/g, "");
+//     const worksheetName = "Claude_" + timestamp;
+    
+//     const newWorksheet = context.workbook.worksheets.add(worksheetName);
+    
+//     // Insert everything for debugging
+//     const lines = response.split('\n');
+//     for (let i = 0; i < lines.length; i++) {
+//       const cell = newWorksheet.getCell(i, 0);
+//       cell.values = [[lines[i]]];
+//     }
+    
+//     newWorksheet.getRange("A:A").format.columnWidth = 400;
+//     newWorksheet.activate();
+//     await context.sync();
+    
+//   } catch (error) {
+//     console.error("Error creating worksheet:", error);
+//     showStatus("Error creating worksheet", "error");
+//   }
+// }
+
+// OLDD
+// async function createSimpleWorksheet(context, response, title) {
+//   try {
+//     // Create new worksheet
+//     const timestamp = new Date().toISOString().slice(0, 16).replace(/[:-]/g, "");
+//     const worksheetName = "Claude_" + timestamp;
+    
+//     const newWorksheet = context.workbook.worksheets.add(worksheetName);
+    
+//     // Extract ONLY tables from code blocks - ignore all other text
+//     const tables = extractOnlyCodeBlockTables(response);
+    
+//     if (tables.length === 0) {
+//       showStatus("No code block tables found in response", "info");
+//       return;
+//     }
+    
+//     let currentRow = 0;
+    
+//     // Insert only the extracted tables
+//     for (let table of tables) {
+//       currentRow = await insertCleanTable(context, newWorksheet, table, currentRow);
+//       currentRow += 2; // Add spacing between tables
+//     }
+    
+//     // Basic formatting
+//     newWorksheet.getRange("A:A").format.columnWidth = 200;
+//     newWorksheet.getRange("B:F").format.columnWidth = 100;
+    
+//     newWorksheet.activate();
+//     await context.sync();
+    
+//   } catch (error) {
+//     console.error("Error creating worksheet:", error);
+//     showStatus("Error creating worksheet", "error");
+//   }
+// }
+
+// async function createSimpleWorksheet(context, response, title) {
+//   try {
+//     const timestamp = new Date().toISOString().slice(0, 16).replace(/[:-]/g, "");
+//     const worksheetName = "Claude_" + timestamp;
+    
+//     const newWorksheet = context.workbook.worksheets.add(worksheetName);
+    
+//     // Extract tables
+//     const tables = extractOnlyCodeBlockTables(response);
+    
+//     // DEBUG: Show what we found directly in Excel
+//     let currentRow = 0;
+    
+//     // Add debug info
+//     const debugCell = newWorksheet.getCell(currentRow, 0);
+//     debugCell.values = [["DEBUG INFO:"]];
+//     debugCell.format.font.bold = true;
+//     currentRow++;
+    
+//     const tablesFoundCell = newWorksheet.getCell(currentRow, 0);
+//     tablesFoundCell.values = [["Tables found: " + tables.length]];
+//     currentRow += 2;
+    
+//     if (tables.length === 0) {
+//       // Show why no tables found
+//       const noTablesCell = newWorksheet.getCell(currentRow, 0);
+//       noTablesCell.values = [["No tables found. Raw response:"]];
+//       currentRow++;
+      
+//       const lines = response.split('\n');
+//       for (let i = 0; i < Math.min(lines.length, 20); i++) {
+//         const cell = newWorksheet.getCell(currentRow + i, 0);
+//         cell.values = [[lines[i]]];
+//       }
+//     } else {
+//       // Show extracted tables
+//       for (let table of tables) {
+//         const titleCell = newWorksheet.getCell(currentRow, 0);
+//         titleCell.values = [["Table: " + table.title + " (Rows: " + table.rows.length + ")"]];
+//         titleCell.format.font.bold = true;
+//         currentRow++;
+        
+//         for (let row of table.rows) {
+//           for (let colIndex = 0; colIndex < row.length; colIndex++) {
+//             const cell = newWorksheet.getCell(currentRow, colIndex);
+//             cell.values = [[row[colIndex]]];
+//           }
+//           currentRow++;
+//         }
+//         currentRow++; // spacing
+//       }
+//     }
+    
+//     newWorksheet.getRange("A:A").format.columnWidth = 400;
+//     newWorksheet.activate();
+//     await context.sync();
+    
+//   } catch (error) {
+//     console.error("Error creating worksheet:", error);
+//     showStatus("Error creating worksheet", "error");
+//   }
+// }
+
+// function extractOnlyCodeBlockTables(response) {
+//   const tables = [];
+//   const lines = response.split('\n');
+  
+//   let inCodeBlock = false;
+//   let currentTable = [];
+//   let tableTitle = "";
+  
+//   for (let i = 0; i < lines.length; i++) {
+//     const line = lines[i].trim();
+    
+//     // Look for code blocks with ``` 
+//     if (line.startsWith('```') || line === '```') {
+//       if (!inCodeBlock) {
+//         // Starting code block
+//         inCodeBlock = true;
+//         currentTable = [];
+//         tableTitle = findTableTitle(lines, i);
+//         console.log("Found code block start, title:", tableTitle);
+//       } else {
+//         // Ending code block
+//         console.log("Found code block end, rows collected:", currentTable.length);
+//         if (currentTable.length > 0) {
+//           tables.push({
+//             title: tableTitle || "Data",
+//             rows: currentTable
+//           });
+//         }
+//         inCodeBlock = false;
+//         currentTable = [];
+//         tableTitle = "";
+//       }
+//     } else if (inCodeBlock && line) {
+//       // Only process lines inside code blocks
+//       console.log("Processing code block line:", line);
+//       const cells = parseCleanRow(line);
+//       if (cells.length > 0) {
+//         console.log("Parsed cells:", cells);
+//         currentTable.push(cells);
+//       }
+//     }
+//   }
+  
+//   console.log("Total tables extracted:", tables.length);
+//   return tables;
+// }
+
+// function extractOnlyCodeBlockTables(response) {
+//   const tables = [];
+//   const lines = response.split('\n');
+  
+//   let inCodeBlock = false;
+//   let currentTable = [];
+//   let tableTitle = "";
+  
+//   for (let i = 0; i < lines.length; i++) {
+//     const line = lines[i].trim();
+    
+//     if (line === '```') {
+//       if (!inCodeBlock) {
+//         // Starting code block - look for title in previous lines
+//         inCodeBlock = true;
+//         currentTable = [];
+//         tableTitle = findTableTitle(lines, i);
+//       } else {
+//         // Ending code block - save table if it has data
+//         if (currentTable.length > 0) {
+//           tables.push({
+//             title: tableTitle || "Data",
+//             rows: currentTable
+//           });
+//         }
+//         inCodeBlock = false;
+//         currentTable = [];
+//         tableTitle = "";
+//       }
+//     } else if (inCodeBlock && line) {
+//       // Only process lines inside code blocks
+//       const cells = parseCleanRow(line);
+//       if (cells.length > 0) {
+//         currentTable.push(cells);
+//       }
+//     }
+//     // Completely ignore all lines outside code blocks
+//   }
+  
+//   return tables;
+// }
 
 async function createSimpleWorksheet(context, response, title) {
   try {
-    // Create new worksheet
     const timestamp = new Date().toISOString().slice(0, 16).replace(/[:-]/g, "");
     const worksheetName = "Claude_" + timestamp;
     
     const newWorksheet = context.workbook.worksheets.add(worksheetName);
     
-    // Extract ONLY tables from code blocks - ignore all other text
     const tables = extractOnlyCodeBlockTables(response);
     
     if (tables.length === 0) {
@@ -168,13 +379,11 @@ async function createSimpleWorksheet(context, response, title) {
     
     let currentRow = 0;
     
-    // Insert only the extracted tables
     for (let table of tables) {
       currentRow = await insertCleanTable(context, newWorksheet, table, currentRow);
-      currentRow += 2; // Add spacing between tables
+      currentRow += 2;
     }
     
-    // Basic formatting
     newWorksheet.getRange("A:A").format.columnWidth = 200;
     newWorksheet.getRange("B:F").format.columnWidth = 100;
     
@@ -182,8 +391,7 @@ async function createSimpleWorksheet(context, response, title) {
     await context.sync();
     
   } catch (error) {
-    console.error("Error creating worksheet:", error);
-    showStatus("Error creating worksheet", "error");
+    showStatus("Error creating worksheet: " + error.message, "error");
   }
 }
 
@@ -198,14 +406,12 @@ function extractOnlyCodeBlockTables(response) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     
-    if (line === '```') {
+    if (line.startsWith('```') || line === '```') {
       if (!inCodeBlock) {
-        // Starting code block - look for title in previous lines
         inCodeBlock = true;
         currentTable = [];
         tableTitle = findTableTitle(lines, i);
       } else {
-        // Ending code block - save table if it has data
         if (currentTable.length > 0) {
           tables.push({
             title: tableTitle || "Data",
@@ -217,16 +423,106 @@ function extractOnlyCodeBlockTables(response) {
         tableTitle = "";
       }
     } else if (inCodeBlock && line) {
-      // Only process lines inside code blocks
       const cells = parseCleanRow(line);
       if (cells.length > 0) {
         currentTable.push(cells);
       }
     }
-    // Completely ignore all lines outside code blocks
   }
   
   return tables;
+}
+
+function cleanCellValue(value) {
+  if (!value || value === '') return '';
+  
+  let cleanValue = String(value).trim();
+  
+  // Handle Excel formula issues - replace problematic starting characters
+  if (cleanValue === '+' || cleanValue === '-') {
+    return '—'; // Use em dash for standalone + or -
+  }
+  
+  // Handle cells that start with + or - but aren't numbers
+  if (cleanValue.startsWith('+') && !cleanValue.match(/^\+[\d,\.]+/)) {
+    cleanValue = '＋' + cleanValue.slice(1); // Use full-width plus
+  }
+  
+  if (cleanValue.startsWith('-') && !cleanValue.match(/^-[\d,\.]+/)) {
+    cleanValue = '—' + cleanValue.slice(1); // Use em dash
+  }
+  
+  return cleanValue;
+}
+
+async function insertCleanTable(context, worksheet, table, startRow) {
+  let currentRow = startRow;
+  
+  try {
+    if (table.title && table.title !== "Data" && table.title !== "Table") {
+      const titleCell = worksheet.getCell(currentRow, 0);
+      titleCell.values = [[table.title]];
+      titleCell.format.font.bold = true;
+      titleCell.format.font.size = 12;
+      titleCell.format.fill.color = "#4472C4";
+      titleCell.format.font.color = "white";
+      currentRow++;
+    }
+    
+    for (let rowIndex = 0; rowIndex < table.rows.length; rowIndex++) {
+      const row = table.rows[rowIndex];
+      
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        const cell = worksheet.getCell(currentRow, colIndex);
+        let cellValue = row[colIndex];
+        
+        if (cellValue === undefined || cellValue === null) {
+          cell.values = [['']];
+          continue;
+        }
+        
+        // Clean the cell value to handle + and - issues
+        cellValue = cleanCellValue(cellValue);
+        
+        // Handle numeric values
+        const cleanNumValue = cellValue.replace(/,/g, '').replace(/[()$]/g, '');
+        const numValue = parseFloat(cleanNumValue);
+        
+        if (!isNaN(numValue) && cellValue.match(/[\d,]/)) {
+          cell.values = [[numValue]];
+          
+          if (Math.abs(numValue) >= 100) {
+            cell.numberFormat = [["#,##0"]];
+          }
+          
+          if (cellValue.includes('%')) {
+            cell.numberFormat = [["0%"]];
+            cell.values = [[numValue / 100]];
+          }
+          
+          cell.format.horizontalAlignment = "Right";
+        } else {
+          cell.values = [[cellValue]];
+          
+          if (colIndex === 0) {
+            cell.format.horizontalAlignment = "Left";
+          }
+        }
+        
+        if (rowIndex === 0 || cellValue.includes('Year') || cellValue.includes('$')) {
+          cell.format.font.bold = true;
+          cell.format.fill.color = "#D9E2F3";
+        }
+      }
+      
+      currentRow++;
+    }
+    
+    return currentRow;
+    
+  } catch (error) {
+    throw error;
+  }
 }
 
 function findTableTitle(lines, codeBlockIndex) {
@@ -272,89 +568,90 @@ function parseCleanRow(line) {
   return cells.map(cell => cleanCellValue(cell));
 }
 
-function cleanCellValue(value) {
-  if (!value || value === '') return '';
+/// TOLDDD
+// function cleanCellValue(value) {
+//   if (!value || value === '') return '';
   
-  // Handle the "-" issue - Excel treats "-" as formula
-  if (value === '-') {
-    return '—'; // Use em dash instead
-  }
+//   // Handle the "-" issue - Excel treats "-" as formula
+//   if (value === '-') {
+//     return '—'; // Use em dash instead
+//   }
   
-  // Handle cells that start with "-" but aren't formulas
-  if (value.startsWith('-') && !value.match(/^-[\d,\.]+/)) {
-    return '—' + value.slice(1); // Replace leading hyphen with em dash
-  }
+//   // Handle cells that start with "-" but aren't formulas
+//   if (value.startsWith('-') && !value.match(/^-[\d,\.]+/)) {
+//     return '—' + value.slice(1); // Replace leading hyphen with em dash
+//   }
   
-  // Clean up other problematic characters
-  return value.trim();
-}
+//   // Clean up other problematic characters
+//   return value.trim();
+// }
 
-async function insertCleanTable(context, worksheet, table, startRow) {
-  let currentRow = startRow;
+// async function insertCleanTable(context, worksheet, table, startRow) {
+//   let currentRow = startRow;
   
-  // Insert title if it exists and is meaningful
-  if (table.title && table.title !== "Data" && table.title !== "Table") {
-    const titleCell = worksheet.getCell(currentRow, 0);
-    titleCell.values = [[table.title]];
-    titleCell.format.font.bold = true;
-    titleCell.format.font.size = 12;
-    titleCell.format.fill.color = "#4472C4";
-    titleCell.format.font.color = "white";
-    currentRow++;
-  }
+//   // Insert title if it exists and is meaningful
+//   if (table.title && table.title !== "Data" && table.title !== "Table") {
+//     const titleCell = worksheet.getCell(currentRow, 0);
+//     titleCell.values = [[table.title]];
+//     titleCell.format.font.bold = true;
+//     titleCell.format.font.size = 12;
+//     titleCell.format.fill.color = "#4472C4";
+//     titleCell.format.font.color = "white";
+//     currentRow++;
+//   }
   
-  // Insert rows
-  for (let rowIndex = 0; rowIndex < table.rows.length; rowIndex++) {
-    const row = table.rows[rowIndex];
+//   // Insert rows
+//   for (let rowIndex = 0; rowIndex < table.rows.length; rowIndex++) {
+//     const row = table.rows[rowIndex];
     
-    for (let colIndex = 0; colIndex < row.length; colIndex++) {
-      const cell = worksheet.getCell(currentRow, colIndex);
-      const cellValue = row[colIndex];
+//     for (let colIndex = 0; colIndex < row.length; colIndex++) {
+//       const cell = worksheet.getCell(currentRow, colIndex);
+//       const cellValue = row[colIndex];
       
-      // Handle numeric values
-      const cleanNumValue = cellValue.replace(/,/g, '').replace(/[()]/g, '');
-      const numValue = parseFloat(cleanNumValue);
+//       // Handle numeric values
+//       const cleanNumValue = cellValue.replace(/,/g, '').replace(/[()]/g, '');
+//       const numValue = parseFloat(cleanNumValue);
       
-      if (!isNaN(numValue) && cellValue.match(/[\d,]/)) {
-        // It's a number
-        cell.values = [[numValue]];
+//       if (!isNaN(numValue) && cellValue.match(/[\d,]/)) {
+//         // It's a number
+//         cell.values = [[numValue]];
         
-        // Format large numbers with commas
-        if (Math.abs(numValue) >= 100) {
-          cell.numberFormat = [["#,##0"]];
-        }
+//         // Format large numbers with commas
+//         if (Math.abs(numValue) >= 100) {
+//           cell.numberFormat = [["#,##0"]];
+//         }
         
-        // Handle percentages
-        if (cellValue.includes('%')) {
-          cell.numberFormat = [["0%"]];
-          cell.values = [[numValue / 100]];
-        }
+//         // Handle percentages
+//         if (cellValue.includes('%')) {
+//           cell.numberFormat = [["0%"]];
+//           cell.values = [[numValue / 100]];
+//         }
         
-        // Right align numbers
-        cell.format.horizontalAlignment = "Right";
-      } 
-      // Handle text values (including cleaned "-" characters)
-      else {
-        cell.values = [[cellValue]];
+//         // Right align numbers
+//         cell.format.horizontalAlignment = "Right";
+//       } 
+//       // Handle text values (including cleaned "-" characters)
+//       else {
+//         cell.values = [[cellValue]];
         
-        // Left align text
-        if (colIndex === 0) {
-          cell.format.horizontalAlignment = "Left";
-        }
-      }
+//         // Left align text
+//         if (colIndex === 0) {
+//           cell.format.horizontalAlignment = "Left";
+//         }
+//       }
       
-      // Format headers (first row or rows containing "Year")
-      if (rowIndex === 0 || cellValue.includes('Year') || cellValue.includes('$')) {
-        cell.format.font.bold = true;
-        cell.format.fill.color = "#D9E2F3";
-      }
-    }
+//       // Format headers (first row or rows containing "Year")
+//       if (rowIndex === 0 || cellValue.includes('Year') || cellValue.includes('$')) {
+//         cell.format.font.bold = true;
+//         cell.format.fill.color = "#D9E2F3";
+//       }
+//     }
     
-    currentRow++;
-  }
+//     currentRow++;
+//   }
   
-  return currentRow;
-}
+//   return currentRow;
+// }
 
 function parseSimpleRow(line) {
   // This function is now replaced by parseCleanRow
